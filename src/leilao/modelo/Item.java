@@ -22,6 +22,10 @@ public class Item {
     private Calendar fim;
     private Calendar criadoEm;
     private List<Categoria> categorias;
+    
+    private List<Lance> lances;
+    private Lance vencedor;
+    
 
     public Item() {
     }
@@ -130,5 +134,34 @@ public class Item {
         this.categorias = categorias;
     }
     
+    public List<Lance> getLances() {
+        return lances;
+    }
+
+    public void setLances(List<Lance> lances) {
+        this.lances = lances;
+    }
+
+    public Lance getVencedor() {
+        return vencedor;
+    }
+
+    public void setVencedor(Lance vencedor) {
+        this.vencedor = vencedor;
+    }
+    
+    public void fecharLeilao() {
+        Calendar agora = Calendar.getInstance();
+        
+        if(fim.after(agora)) {
+            throw new IllegalArgumentException("Leilão não finalizou!");
+        }
+
+        for(Lance lance : getLances()){
+            if(vencedor == null || lance.getValor() > vencedor.getValor()) {
+                vencedor = lance;
+            }
+        }
+    }
     
 }

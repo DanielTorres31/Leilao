@@ -7,16 +7,30 @@ package leilao.modelo;
 
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Transient;
 
 /**
  *
  * @author tarle
  */
+@Entity
 public class Categoria {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nome;
+    
+    @Transient
     private Categoria pai;
+    
+    @Transient
     private List<Categoria> filhas;
+    
+    @Transient
     private List<Item> itens;
 
     public Categoria() {
