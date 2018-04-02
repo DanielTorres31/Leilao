@@ -5,9 +5,11 @@
  */
 package leilao;
 
+import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.Query;
 import leilao.modelo.Categoria;
 
 
@@ -22,6 +24,8 @@ public class Leilao {
      */
     public static void main(String[] args) {
         Categoria c = new Categoria(null, "Teste categoria");
+        Categoria c1 = new Categoria(null, "Teste categoria 2");
+        Categoria c2 = new Categoria(null, "Teste categoria 3");
         
         EntityManagerFactory factory = 
                 Persistence.createEntityManagerFactory("LeilaoPU");
@@ -29,12 +33,21 @@ public class Leilao {
         EntityManager em = factory.createEntityManager();
         em.getTransaction().begin();
         em.persist(c);
+        em.persist(c1);
+        em.persist(c2);
         em.getTransaction().commit();
+        
+        
+        Query q = em.createNamedQuery("Categoria.findAll");
+        List<Categoria> categorias = q.getResultList();
+        
+        for(Categoria aux : categorias)
+            System.out.println(aux);
         
         em.close();
         factory.close();
         
-        System.out.println(c);
+        //System.out.println(c);
     }
     
 }

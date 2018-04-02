@@ -7,10 +7,17 @@ package leilao.modelo;
 
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import javax.persistence.Transient;
 
 /**
@@ -18,16 +25,25 @@ import javax.persistence.Transient;
  * @author tarle
  */
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Categoria.findAll", query = "SELECT c FROM Categoria c"),
+    @NamedQuery(name = "Categoria.findByName", query = "SELECT c FROM Categoria c WHERE c.nome = :nome")
+})
+@Table(name = "tb_categoria")
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_categoria", nullable = false)
     private Integer id;
+    
+    @Column(name = "nom_categoria", length = 100, nullable = false)
     private String nome;
     
-    @Transient
+    @ManyToOne
+    @JoinColumn(name = "id_categoria_pai")
     private Categoria pai;
     
-    @Transient
+    @OneToMany(mappedBy = "pai")
     private List<Categoria> filhas;
     
     @Transient
