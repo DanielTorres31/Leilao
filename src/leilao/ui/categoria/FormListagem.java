@@ -5,18 +5,32 @@
  */
 package leilao.ui.categoria;
 
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
+import javax.persistence.Query;
+import javax.swing.JOptionPane;
+import leilao.modelo.Categoria;
+
 /**
  *
  * @author tarle
  */
 public class FormListagem extends javax.swing.JDialog {
 
+    private EntityManagerFactory factory;
+    private EntityManager entity;
+    
     /**
      * Creates new form FormListagem
      */
     public FormListagem(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        
         initComponents();
+        
+        this.setLocationRelativeTo(null);        
         tblCategorias.setModel(new CategoriaModel());
     }
 
@@ -37,10 +51,23 @@ public class FormListagem extends javax.swing.JDialog {
         btnAdd = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         jLabel1.setText("Nome:");
 
         btnPesquisar.setText("Pesquisar");
+        btnPesquisar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnPesquisarActionPerformed(evt);
+            }
+        });
 
         tblCategorias.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -92,6 +119,33 @@ public class FormListagem extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed
+        // TODO add your handling code here:
+        String filtro = txtNome.getText();
+        
+        Query q = entity.createNamedQuery("Categoria.findByName");
+        q.setParameter("nome", "%" + filtro + "%");
+        
+        List<Categoria> lista = q.getResultList();
+        
+        tblCategorias.setModel(new CategoriaModel(lista));
+
+        if(lista.isEmpty())
+            JOptionPane.showMessageDialog(this, "Nenhuma categoria encontrada.");
+    }//GEN-LAST:event_btnPesquisarActionPerformed
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        // TODO add your handling code here:
+        entity.close();
+        factory.close();
+    }//GEN-LAST:event_formWindowClosed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        // TODO add your handling code here:
+        factory = Persistence.createEntityManagerFactory("LeilaoPU");
+        entity = factory.createEntityManager();
+    }//GEN-LAST:event_formWindowOpened
 
     /**
      * @param args the command line arguments

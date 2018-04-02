@@ -27,7 +27,7 @@ import javax.persistence.Transient;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Categoria.findAll", query = "SELECT c FROM Categoria c"),
-    @NamedQuery(name = "Categoria.findByName", query = "SELECT c FROM Categoria c WHERE c.nome = :nome")
+    @NamedQuery(name = "Categoria.findByName", query = "SELECT c FROM Categoria c WHERE c.nome LIKE :nome")
 })
 @Table(name = "tb_categoria")
 public class Categoria {
