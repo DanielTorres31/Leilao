@@ -27,6 +27,7 @@ import javax.persistence.Transient;
 @Entity
 @NamedQueries({
     @NamedQuery(name = "Categoria.findAll", query = "SELECT c FROM Categoria c"),
+    @NamedQuery(name = "Categoria.findAllToCombobox", query = "SELECT new leilao.ui.combobox.Item(c.id, c.nome) FROM Categoria c"),
     @NamedQuery(name = "Categoria.findByName", query = "SELECT c FROM Categoria c WHERE c.nome LIKE :nome")
 })
 @Table(name = "tb_categoria")

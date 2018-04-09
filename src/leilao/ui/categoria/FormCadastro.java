@@ -7,9 +7,14 @@ package leilao.ui.categoria;
 
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JOptionPane;
 import leilao.modelo.Categoria;
+import leilao.ui.combobox.Item;
+
 
 /**
  *
@@ -17,8 +22,8 @@ import leilao.modelo.Categoria;
  */
 public class FormCadastro extends javax.swing.JDialog {
 
-    private DefaultComboBoxModel<String> model;
     private EntityManager entity;
+    private Categoria categoria;
     
     /**
      * Creates new form FormCadastro
@@ -29,17 +34,28 @@ public class FormCadastro extends javax.swing.JDialog {
         this.entity = em;
         
         initComponents();
+        initComboBoxCategoria();        
+    }
+    
+    public FormCadastro(java.awt.Frame parent, boolean modal, EntityManager em, Categoria categoria) {
+        this(parent, modal, em);
         
-        model = new DefaultComboBoxModel<>();
-        cbxPai.setModel(model);
+        this.categoria = categoria;
         
-        model.addElement("N/A");
+        Categoria pai = categoria.getPai();
+        if(pai != null)
+            cbxPai.setSelectedItem(new Item(pai.getId(), pai.getNome()));
+    }
+    
+    private void initComboBoxCategoria() {
+        cbxPai.removeAllItems();
+        cbxPai.addItem(new Item(-1, "N/A"));
         
-        Query q = em.createNamedQuery("Categoria.findAll");
-        List<Categoria> lista = q.getResultList();
+        Query q = entity.createNamedQuery("Categoria.findAllToCombobox");
+        List<Item> lista = q.getResultList();
         
-        for(Categoria c : lista) {
-            model.addElement(c.getNome());
+        for(Item i : lista) {
+            cbxPai.addItem(i);
         }
     }
 
@@ -65,7 +81,7 @@ public class FormCadastro extends javax.swing.JDialog {
 
         jLabel2.setText("Pai:");
 
-        cbxPai.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbxPai.setModel(new DefaultComboBoxModel<Item>());
 
         btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
@@ -129,6 +145,7 @@ public class FormCadastro extends javax.swing.JDialog {
         txtNome.setText("");
         txtNome.requestFocus();
         
+        initComboBoxCategoria();
         cbxPai.setSelectedIndex(0);
     }//GEN-LAST:event_btnLimparActionPerformed
 
@@ -136,66 +153,82 @@ public class FormCadastro extends javax.swing.JDialog {
         // TODO add your handling code here:
         entity.getTransaction().begin();
         
-        Categoria c = new Categoria();
+        Categoria c = categoria;
+        
+        if(c == null)
+            c = new Categoria();
+        
         c.setNome(txtNome.getText());
         
         if(cbxPai.getSelectedIndex() > 0) {
-            Query q = entity.createNamedQuery("Categoria.findByName");
-            q.setParameter("nome", cbxPai.getSelectedItem());
+            //Query q = entity.createNamedQuery("Categoria.findByName");
+            //q.setParameter("nome", cbxPai.getSelectedItem());
                        
-            Categoria pai = (Categoria) q.getSingleResult();
-            c.setPai(pai);
+            Item item = (Item) cbxPai.getSelectedItem();
+            
+            if(item.getId() > 0)
+                c.setPai(entity.find(Categoria.class, item.getId()));
         }
         entity.persist(c);
         entity.getTransaction().commit();
+        
+        JOptionPane.showMessageDialog(this, "Categoria cadastrada com sucesso");
+        btnLimparActionPerformed(evt);
     }//GEN-LAST:event_btnSalvarActionPerformed
 
     /**
      * @param args the command line arguments
      */
-//    public static void main(String args[]) {
-//        /* Set the Nimbus look and feel */
-//        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-//        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-//         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-//         */
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException ex) {
-//            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (InstantiationException ex) {
-//            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (IllegalAccessException ex) {
-//            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
-//        //</editor-fold>
-//
-//        /* Create and display the dialog */
-//        java.awt.EventQueue.invokeLater(new Runnable() {
-//            public void run() {
-//                FormCadastro dialog = new FormCadastro(new javax.swing.JFrame(), true);
-//                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-//                    @Override
-//                    public void windowClosing(java.awt.event.WindowEvent e) {
-//                        System.exit(0);
-//                    }
-//                });
-//                dialog.setVisible(true);
-//            }
-//        });
-//    }
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(FormCadastro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the dialog */
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                
+                EntityManagerFactory factory = Persistence.createEntityManagerFactory("LeilaoPU");
+                EntityManager em = factory.createEntityManager();
+                
+                FormCadastro dialog = new FormCadastro(new javax.swing.JFrame(), true, em);
+                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosing(java.awt.event.WindowEvent e) {
+                        System.exit(0);
+                    }
+                });
+                dialog.setVisible(true);
+                
+                em.close();
+                factory.close();
+            }
+        });
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvar;
-    private javax.swing.JComboBox<String> cbxPai;
+    private javax.swing.JComboBox<Item> cbxPai;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField txtNome;

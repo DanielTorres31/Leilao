@@ -50,6 +50,7 @@ public class FormListagem extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblCategorias = new javax.swing.JTable();
         btnAdd = new javax.swing.JButton();
+        btnExcluir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -81,12 +82,25 @@ public class FormListagem extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblCategorias.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        tblCategorias.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCategoriasMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblCategorias);
 
         btnAdd.setText("Adicionar Categoria");
         btnAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddActionPerformed(evt);
+            }
+        });
+
+        btnExcluir.setText("Excluir Categoria");
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirActionPerformed(evt);
             }
         });
 
@@ -106,7 +120,9 @@ public class FormListagem extends javax.swing.JDialog {
                         .addComponent(btnPesquisar))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btnAdd)))
+                        .addComponent(btnAdd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -118,7 +134,9 @@ public class FormListagem extends javax.swing.JDialog {
                     .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPesquisar))
                 .addGap(18, 18, 18)
-                .addComponent(btnAdd)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAdd)
+                    .addComponent(btnExcluir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -157,7 +175,39 @@ public class FormListagem extends javax.swing.JDialog {
         // TODO add your handling code here:
         FormCadastro c = new FormCadastro((Frame) this.getParent(), true, entity);
         c.setVisible(true);
+        btnPesquisarActionPerformed(evt);
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+        // TODO add your handling code here:
+        if(tblCategorias.getSelectedRowCount() > 0) {
+            
+            CategoriaModel model = (CategoriaModel) tblCategorias.getModel();            
+            entity.getTransaction().begin();
+            
+            for(int row : tblCategorias.getSelectedRows()) {
+                Categoria c = model.getCategoria(row);
+                entity.remove(c);
+            }
+            
+            entity.getTransaction().commit();
+            
+            JOptionPane.showMessageDialog(null, "Categorias excluidas com sucesso!");
+            btnPesquisarActionPerformed(evt);
+        }
+    }//GEN-LAST:event_btnExcluirActionPerformed
+
+    private void tblCategoriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCategoriasMouseClicked
+        // TODO add your handling code here:
+        if(evt.getClickCount() > 1 && tblCategorias.getSelectedRowCount() > 0) {
+            CategoriaModel model = (CategoriaModel) tblCategorias.getModel();
+            int row = tblCategorias.getSelectedRow();
+            
+            FormCadastro c = new FormCadastro((Frame) this.getParent(), true, entity, model.getCategoria(row));
+            c.setVisible(true);
+            btnPesquisarActionPerformed(null);
+        }
+    }//GEN-LAST:event_tblCategoriasMouseClicked
 
     /**
      * @param args the command line arguments
@@ -203,6 +253,7 @@ public class FormListagem extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnPesquisar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
