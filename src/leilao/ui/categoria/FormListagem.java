@@ -5,6 +5,7 @@
  */
 package leilao.ui.categoria;
 
+import java.awt.Frame;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -83,6 +84,11 @@ public class FormListagem extends javax.swing.JDialog {
         jScrollPane1.setViewportView(tblCategorias);
 
         btnAdd.setText("Adicionar Categoria");
+        btnAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAddActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -146,6 +152,12 @@ public class FormListagem extends javax.swing.JDialog {
         factory = Persistence.createEntityManagerFactory("LeilaoPU");
         entity = factory.createEntityManager();
     }//GEN-LAST:event_formWindowOpened
+
+    private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
+        // TODO add your handling code here:
+        FormCadastro c = new FormCadastro((Frame) this.getParent(), true, entity);
+        c.setVisible(true);
+    }//GEN-LAST:event_btnAddActionPerformed
 
     /**
      * @param args the command line arguments

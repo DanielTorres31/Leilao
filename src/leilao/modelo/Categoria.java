@@ -30,7 +30,7 @@ import javax.persistence.Transient;
     @NamedQuery(name = "Categoria.findByName", query = "SELECT c FROM Categoria c WHERE c.nome LIKE :nome")
 })
 @Table(name = "tb_categoria")
-public class Categoria {
+public class Categoria{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_categoria", nullable = false)
