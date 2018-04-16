@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.Query;
+import javax.persistence.RollbackException;
 import javax.swing.JOptionPane;
 import leilao.modelo.Categoria;
 
@@ -22,16 +23,16 @@ public class FormListagem extends javax.swing.JDialog {
 
     private EntityManagerFactory factory;
     private EntityManager entity;
-    
+
     /**
      * Creates new form FormListagem
      */
     public FormListagem(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
-        
+
         initComponents();
-        
-        this.setLocationRelativeTo(null);        
+
+        this.setLocationRelativeTo(null);
         tblCategorias.setModel(new CategoriaModel());
     }
 
@@ -50,6 +51,7 @@ public class FormListagem extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblCategorias = new javax.swing.JTable();
         btnAdd = new javax.swing.JButton();
+        btnExcluir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -90,6 +92,13 @@ public class FormListagem extends javax.swing.JDialog {
             }
         });
 
+        btnExcluir.setText("Excluir Categoria");
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnExcluirActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -106,7 +115,9 @@ public class FormListagem extends javax.swing.JDialog {
                         .addComponent(btnPesquisar))
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(btnAdd)))
+                        .addComponent(btnAdd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -118,7 +129,9 @@ public class FormListagem extends javax.swing.JDialog {
                     .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnPesquisar))
                 .addGap(18, 18, 18)
-                .addComponent(btnAdd)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAdd)
+                    .addComponent(btnExcluir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -129,16 +142,17 @@ public class FormListagem extends javax.swing.JDialog {
     private void btnPesquisarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPesquisarActionPerformed
         // TODO add your handling code here:
         String filtro = txtNome.getText();
-        
+
         Query q = entity.createNamedQuery("Categoria.findByName");
         q.setParameter("nome", "%" + filtro + "%");
-        
+
         List<Categoria> lista = q.getResultList();
-        
+
         tblCategorias.setModel(new CategoriaModel(lista));
 
-        if(lista.isEmpty())
+        if (lista.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Nenhuma categoria encontrada.");
+        }
     }//GEN-LAST:event_btnPesquisarActionPerformed
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -158,6 +172,36 @@ public class FormListagem extends javax.swing.JDialog {
         FormCadastro c = new FormCadastro((Frame) this.getParent(), true, entity);
         c.setVisible(true);
     }//GEN-LAST:event_btnAddActionPerformed
+
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
+        // TODO add your handling code here:
+        if (tblCategorias.getSelectedRowCount() > 0) {
+            int opcao = JOptionPane
+                    .showConfirmDialog(this, "Confirma a exclusão das categorias?");
+
+            if (opcao == JOptionPane.YES_OPTION) {
+                int[] rows = tblCategorias.getSelectedRows();
+
+                entity.getTransaction().begin();
+                for (int row : rows) {
+                    CategoriaModel model = (CategoriaModel) tblCategorias.getModel();
+                    Categoria c = model.getCategoria(row);
+
+                    entity.remove(entity.find(Categoria.class, c.getId()));
+                }
+                
+                try {
+                    entity.getTransaction().commit();
+                    JOptionPane.showMessageDialog(this, 
+                            "Categorias removidas com sucesso.");
+                    btnPesquisarActionPerformed(evt);
+                }catch(RollbackException e) {
+                    JOptionPane.showMessageDialog(this, 
+                            "Categoria referenciada por outra.");
+                }
+            }
+        }
+    }//GEN-LAST:event_btnExcluirActionPerformed
 
     /**
      * @param args the command line arguments
@@ -203,6 +247,7 @@ public class FormListagem extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
+    private javax.swing.JButton btnExcluir;
     private javax.swing.JButton btnPesquisar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;

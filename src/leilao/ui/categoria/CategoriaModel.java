@@ -61,5 +61,7 @@ public class CategoriaModel extends AbstractTableModel {
         }
     }
     
-    
+    public Categoria getCategoria(int row) {
+        return listaCategorias.get(row);
+    }
 }
