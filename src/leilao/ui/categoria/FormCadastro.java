@@ -5,6 +5,7 @@
  */
 package leilao.ui.categoria;
 
+import java.awt.Frame;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -23,27 +24,49 @@ import leilao.ui.combobox.Item;
 public class FormCadastro extends javax.swing.JDialog {
 
     private EntityManager entity;
-    
+    private Categoria categoria;
+
     /**
      * Creates new form FormCadastro
      */
     public FormCadastro(java.awt.Frame parent, boolean modal, EntityManager em) {
         super(parent, modal);
-        
+
         this.entity = em;
-        
-        initComponents();        
+
+        initComponents();
         initCombobox();
+
+        btnLimpar.setVisible(true);
+        btnCancelar.setVisible(false);
+    }
+
+    public FormCadastro(Frame frame, boolean b, EntityManager entity, Categoria c) {
+        this(frame, b, entity);
+
+        this.categoria = c;
+
+        txtNome.setText(c.getNome());
+
+        Categoria pai = c.getPai();
+
+        if (pai != null) {
+            Item item = new Item(pai.getId(), pai.getNome());
+            cbxPai.setSelectedItem(item);
+        }
+
+        btnLimpar.setVisible(false);
+        btnCancelar.setVisible(true);
     }
 
     private void initCombobox() {
         DefaultComboBoxModel<Item> model = (DefaultComboBoxModel<Item>) cbxPai.getModel();
         model.addElement(Item.criarItemVazio());
-        
+
         Query q = entity.createNamedQuery("Categoria.findAll.toCombobox");
         List<Item> lista = q.getResultList();
-        
-        for(Item i : lista) {
+
+        for (Item i : lista) {
             model.addElement(i);
         }
     }
@@ -61,8 +84,10 @@ public class FormCadastro extends javax.swing.JDialog {
         txtNome = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
         cbxPai = new javax.swing.JComboBox<>();
+        jPanel1 = new javax.swing.JPanel();
         btnSalvar = new javax.swing.JButton();
         btnLimpar = new javax.swing.JButton();
+        btnCancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Cadastro de categoria");
@@ -79,6 +104,7 @@ public class FormCadastro extends javax.swing.JDialog {
                 btnSalvarActionPerformed(evt);
             }
         });
+        jPanel1.add(btnSalvar);
 
         btnLimpar.setText("Limpar");
         btnLimpar.addActionListener(new java.awt.event.ActionListener() {
@@ -86,6 +112,15 @@ public class FormCadastro extends javax.swing.JDialog {
                 btnLimparActionPerformed(evt);
             }
         });
+        jPanel1.add(btnLimpar);
+
+        btnCancelar.setText("Cancelar");
+        btnCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelarActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnCancelar);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -93,20 +128,18 @@ public class FormCadastro extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(jLabel2)
-                            .addGap(18, 18, 18)
-                            .addComponent(cbxPai, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnSalvar)
+                        .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnLimpar)))
+                        .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(cbxPai, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(13, 13, 13)))
                 .addContainerGap(27, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -120,11 +153,9 @@ public class FormCadastro extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(cbxPai, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(39, 39, 39)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnSalvar)
-                    .addComponent(btnLimpar))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -134,27 +165,49 @@ public class FormCadastro extends javax.swing.JDialog {
         // TODO add your handling code here:
         txtNome.setText("");
         txtNome.requestFocus();
-        
+
         cbxPai.setSelectedIndex(0);
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
         // TODO add your handling code here:
         entity.getTransaction().begin();
-        
-        Categoria c = new Categoria();
+
+        Categoria c = categoria;
+        if (c == null) {
+            c = new Categoria();
+        }
+
         c.setNome(txtNome.getText());
-        
-        if(cbxPai.getSelectedIndex() > 0) {
+
+        if (cbxPai.getSelectedIndex() > 0) {
             Item pai = (Item) cbxPai.getSelectedItem();
             c.setPai(entity.find(Categoria.class, pai.getId()));
+        } else {
+            c.setPai(null);
         }
-        entity.persist(c);
+
+        if (c.getId() == null) {
+            entity.persist(c);
+        } else {
+            entity.merge(c);
+        }
+
         entity.getTransaction().commit();
         
-        JOptionPane.showMessageDialog(this, "Categoria criada com sucesso!");
-        btnLimparActionPerformed(evt);
+        if(categoria == null) {
+            JOptionPane.showMessageDialog(this, "Categoria criada com sucesso!");
+            btnLimparActionPerformed(evt);
+        } else {
+            JOptionPane.showMessageDialog(this, "Categoria alterada com sucesso!");
+            setVisible(false);
+        }
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
+        // TODO add your handling code here:
+        setVisible(false);
+    }//GEN-LAST:event_btnCancelarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -188,7 +241,7 @@ public class FormCadastro extends javax.swing.JDialog {
             public void run() {
                 EntityManagerFactory factory = Persistence.createEntityManagerFactory("LeilaoPU");
                 EntityManager em = factory.createEntityManager();
-                
+
                 FormCadastro dialog = new FormCadastro(new javax.swing.JFrame(), true, em);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
@@ -204,11 +257,13 @@ public class FormCadastro extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelar;
     private javax.swing.JButton btnLimpar;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JComboBox<Item> cbxPai;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField txtNome;
     // End of variables declaration//GEN-END:variables
 }

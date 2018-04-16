@@ -83,6 +83,11 @@ public class FormListagem extends javax.swing.JDialog {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblCategorias.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCategoriasMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblCategorias);
 
         btnAdd.setText("Adicionar Categoria");
@@ -202,6 +207,21 @@ public class FormListagem extends javax.swing.JDialog {
             }
         }
     }//GEN-LAST:event_btnExcluirActionPerformed
+
+    private void tblCategoriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCategoriasMouseClicked
+        // TODO add your handling code here:
+        if(evt.getClickCount() == 2 && 
+                tblCategorias.getSelectedRowCount() == 1) {
+            CategoriaModel model = (CategoriaModel) tblCategorias.getModel();
+            int row = tblCategorias.getSelectedRow();
+            Categoria c = model.getCategoria(row);
+          
+            FormCadastro form = new FormCadastro((Frame) getParent(), true, entity, c);
+            form.setVisible(true);
+            
+            btnPesquisarActionPerformed(null);
+        }
+    }//GEN-LAST:event_tblCategoriasMouseClicked
 
     /**
      * @param args the command line arguments
