@@ -179,7 +179,7 @@ public class FormListagem extends javax.swing.JDialog {
     }//GEN-LAST:event_btnAddActionPerformed
 
     private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here: git copy
         if (tblCategorias.getSelectedRowCount() > 0) {
             int opcao = JOptionPane
                     .showConfirmDialog(this, "Confirma a exclusão das categorias?");
@@ -209,7 +209,7 @@ public class FormListagem extends javax.swing.JDialog {
     }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void tblCategoriasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCategoriasMouseClicked
-        // TODO add your handling code here:
+        // TODO add your handling code here: git copy
         if(evt.getClickCount() == 2 && 
                 tblCategorias.getSelectedRowCount() == 1) {
             CategoriaModel model = (CategoriaModel) tblCategorias.getModel();
