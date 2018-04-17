@@ -170,7 +170,7 @@ public class FormCadastro extends javax.swing.JDialog {
     }//GEN-LAST:event_btnLimparActionPerformed
 
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here: git copy
         entity.getTransaction().begin();
 
         Categoria c = categoria;
